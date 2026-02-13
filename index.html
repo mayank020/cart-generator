@@ -116,6 +116,16 @@
             word-break: break-word;
         }
 
+        .cors-note {
+            background: #fefcbf;
+            border: 1px solid #ecc94b;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #744210;
+        }
+
         .error-box {
             background: #fed7d7;
             border: 1px solid #fc8181;
@@ -148,7 +158,14 @@
                 <pre class="json" id="json-response"></pre>
             </div>
             <div id="tab-headers" class="tab-panel">
+                <div class="cors-note">
+                    Note: Browsers only expose CORS-safelisted headers. To see all headers, run the curl command from your terminal.
+                </div>
                 <pre class="json" id="json-headers"></pre>
+                <div style="margin-top:16px;">
+                    <strong>curl command to see all headers:</strong>
+                </div>
+                <pre class="json" id="curl-command"></pre>
             </div>
         </div>
     </div>
@@ -227,9 +244,16 @@ mutation createCart($cartInput: CartInput $countryCode: CountryCode $buyerIdenti
                 });
                 document.getElementById('json-headers').textContent = JSON.stringify({
                     status: res.status,
-                    statusText: res.statusText,
+                    statusText: res.statusText || 'OK',
                     headers: headersObj
                 }, null, 2);
+
+                document.getElementById('curl-command').textContent =
+`curl -sD - '${API_URL}' \\
+  -H 'X-Shopify-Storefront-Access-Token: ${requestHeaders['X-Shopify-Storefront-Access-Token']}' \\
+  -H 'Content-Type: application/json' \\
+  --data-raw '${JSON.stringify(requestBody)}' \\
+  | head -30`;
 
                 const data = await res.json();
 
